@@ -60,7 +60,6 @@ def checkout():
 def success():
   payment_intent_id = request.args.get('payment_intent')
   payment_intent = client.v1.payment_intents.retrieve(payment_intent_id)
-  print(payment_intent.amount, payment_intent.status)   # temporary
   return render_template('success.html', payment_id=payment_intent_id, amount=payment_intent.amount)
 
 if __name__ == '__main__':
