@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, render_template
 
 load_dotenv()
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-print(stripe.api_key[:8])
+client = stripe.StripeClient(os.getenv('STRIPE_SECRET_KEY'))
+
 
 app = Flask(__name__,
   static_url_path='',
@@ -39,6 +39,17 @@ def checkout():
   else:
     # Included in layout view, feel free to assign error
     error = 'No item selected'
+
+    # Create a PaymentIntent with the order amount and currency
+  client_secret = None
+  if amount:
+      payment_intent = client.v1.payment_intents.create({
+          "amount": amount,
+          "currency": "usd",
+          "automatic_payment_methods": {"enabled": True},
+      })
+      client_secret = payment_intent.client_secret
+      print(payment_intent.id)   # temporary: shows the pi_ ID in your terminal
 
   return render_template('checkout.html', title=title, amount=amount, error=error)
 
