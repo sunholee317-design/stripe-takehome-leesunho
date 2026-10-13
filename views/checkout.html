@@ -17,14 +17,13 @@
     </div>
     <div class="card box-shadow mt-40">
       <div class="card-body">
-        <form name="payment-form">
+        <form name="payment-form" id="payment-form">
           <div>
             <label for="email">Email address</label>
             <input type="email" class="form-control" id="email" name="email" placeholder="you@email.com">
           </div>
-          <div class="mt-20 text-center text-secondary border-placeholder">
-            Add Stripe Element here!
-          </div>
+          <div id="payment-element" class="mt-20"></div>
+          <div id="payment-message" class="mt-20 text-danger"></div>
           <div class="mt-20">
             <button type="submit" class="btn btn-lg btn-block btn-primary">Pay $<span class="amount" data-amount="{{ amount }}"></span></button>
           </div>
@@ -33,4 +32,28 @@
     </div>
   </div>
 </div>
+{% if client_secret %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe("{{ stripe_publishable_key }}");
+  const elements = stripe.elements({ clientSecret: "{{ client_secret }}" });
+  const paymentElement = elements.create("payment");
+  paymentElement.mount("#payment-element");
+  const form = document.getElementById("payment-form");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.origin + "/success",
+      },
+    });
+
+    // We only get here if something went wrong (e.g. card declined)
+    document.getElementById("payment-message").textContent = error.message;
+  });
+</script>
+{% endif %}
 {% endblock %}
