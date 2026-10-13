@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, render_template
 
 load_dotenv()
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+print(stripe.api_key[:8])
 
 app = Flask(__name__,
   static_url_path='',
