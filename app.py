@@ -51,13 +51,17 @@ def checkout():
       client_secret = payment_intent.client_secret
       print(payment_intent.id)   # temporary: shows the pi_ ID in your terminal
 
-  return render_template('checkout.html', title=title, amount=amount, error=error)
+  return render_template('checkout.html', title=title, amount=amount, error=error,
+                         client_secret=client_secret,
+                         stripe_publishable_key=os.getenv('STRIPE_PUBLISHABLE_KEY'))
 
 # Success route
 @app.route('/success', methods=['GET'])
 def success():
-  return render_template('success.html')
-
+  payment_intent_id = request.args.get('payment_intent')
+  payment_intent = client.v1.payment_intents.retrieve(payment_intent_id)
+  print(payment_intent.amount, payment_intent.status)   # temporary
+  return render_template('success.html', payment_id=payment_intent_id, amount=payment_intent.amount)
 
 if __name__ == '__main__':
   app.run(port=5000, host='0.0.0.0', debug=True)
