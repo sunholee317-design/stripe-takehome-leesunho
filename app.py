@@ -49,7 +49,6 @@ def checkout():
           "automatic_payment_methods": {"enabled": True},
       })
       client_secret = payment_intent.client_secret
-      print(payment_intent.id)   # temporary: shows the pi_ ID in your terminal
 
   return render_template('checkout.html', title=title, amount=amount, error=error,
                          client_secret=client_secret,
